@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "NURIN — Safety Bestie"
+description = "A warm, premium market-validation website for NURIN’s proposed personal safety keychain concept, with concept disclosures, product vision, FAQs, and a persistent early-access interest form."
+version = "1.0.0"
+id = "artifacts/nurin-safety-bestie"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22793
+
+[services.development]
+run = "pnpm --filter @workspace/nurin-safety-bestie run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/nurin-safety-bestie", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/nurin-safety-bestie/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22793"
+BASE_PATH = "/"

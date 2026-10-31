@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: early-access
+    description: Market-validation interest registration
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /early-access:
+    post:
+      operationId: submitEarlyAccess
+      tags: [early-access]
+      summary: Register interest in Safety Bestie
+      description: Stores an expression of interest for product research and development updates. This is not a purchase or preorder.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EarlyAccessInput"
+      responses:
+        "201":
+          description: Interest registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EarlyAccessResult"
+        "200":
+          description: Interest was already registered for this email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EarlyAccessResult"
+        "400":
+          description: Invalid form data
+        "429":
+          description: Too many submissions
+        "500":
+          description: Registration could not be saved
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    EarlyAccessInput:
+      type: object
+      additionalProperties: false
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 80
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        audience:
+          type: string
+          enum: [student, professional, commuter, parent, other]
+        purchaseInterest:
+          type: string
+          enum: [definitely, probably, unsure, probably_not]
+        priorityFeature:
+          type: string
+          enum: [sos, emergency_contacts, location_sharing, discreet_design, affordability]
+        priceFeeling:
+          type: string
+          description: How the proposed price of approximately Rs 2,600 feels to the respondent.
+          enum: [good_value, reasonable, slightly_high, too_high, cant_say]
+        useReason:
+          type: string
+          description: Optional free text - what would make the respondent trust a product like this.
+          maxLength: 500
+        consent:
+          type: boolean
+          enum: [true]
+      required:
+        - firstName
+        - email
+        - audience
+        - purchaseInterest
+        - priorityFeature
+        - consent
+    EarlyAccessResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success, message]
+

@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'keshavjindal327@gmail.com';
+    }
+
+    function isValidSignup(data) {
+      return data.keys().hasOnly(['firstName', 'email', 'audience', 'purchaseInterest', 'priceFeeling', 'priorityFeature', 'feedback', 'consent', 'createdAt'])
+        && data.firstName is string && data.firstName.size() > 0 && data.firstName.size() <= 80
+        && data.email is string && data.email.size() <= 254
+        && data.email.matches('^[^\\s@/]+@[^\\s@/]+\\.[^\\s@/]+$')
+        && data.email == request.resource.id
+        && data.audience in ['student', 'professional', 'commuter', 'parent', 'other']
+        && data.purchaseInterest in ['definitely', 'probably', 'unsure', 'probably_not']
+        && data.priceFeeling in ['good_value', 'reasonable', 'slightly_high', 'too_high', 'cant_say']
+        && data.priorityFeature in ['sos', 'emergency_contacts', 'location_sharing', 'discreet_design', 'affordability']
+        && (data.feedback == null || (data.feedback is string && data.feedback.size() <= 500))
+        && data.consent == true
+        && data.createdAt == request.time;
+    }
+
+    match /earlyAccess/{email} {
+      allow create: if isValidSignup(request.resource.data);
+      allow read, list: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter @workspace/nurin-safety-bestie build",
+  "outputDirectory": "artifacts/nurin-safety-bestie/dist/public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

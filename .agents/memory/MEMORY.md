@@ -1,0 +1,1 @@
+- [Safety Bestie guardrails](safety-bestie-guardrails.md) — Keep the product at concept stage in all copy; proposed features are unvalidated and signups are not sales.
